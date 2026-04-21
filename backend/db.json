@@ -1,0 +1,191 @@
+{
+  "usuarios": [
+    {
+      "id": "1",
+      "nome": "Tharso",
+      "email": "tharso1209@gmail.com",
+      "senha": "1234"
+    }
+  ],
+  "exercicios": [
+    {
+      "id": "1",
+      "nome": "Leg Press (Machine)",
+      "grupoFoco": "quadriceps",
+      "grupoSecundario": "gluteos",
+      "equipamento": "maquina",
+      "padrao": true,
+      "usuarioId": null
+    },
+    {
+      "id": "2",
+      "nome": "Agachamento Livre",
+      "grupoFoco": "quadriceps",
+      "grupoSecundario": "gluteos",
+      "equipamento": "barra",
+      "padrao": true,
+      "usuarioId": null
+    },
+    {
+      "id": "3",
+      "nome": "Stiff",
+      "grupoFoco": "isquiotibiais",
+      "grupoSecundario": "gluteos",
+      "equipamento": "barra",
+      "padrao": true,
+      "usuarioId": null
+    },
+    {
+      "id": "4",
+      "nome": "Supino Reto",
+      "grupoFoco": "peitoral",
+      "grupoSecundario": "triceps",
+      "equipamento": "barra",
+      "padrao": true,
+      "usuarioId": null
+    },
+    {
+      "id": "5",
+      "nome": "Supino Inclinado",
+      "grupoFoco": "peitoral_superior",
+      "grupoSecundario": "deltoide_anterior",
+      "equipamento": "halteres",
+      "padrao": true,
+      "usuarioId": null
+    },
+    {
+      "id": "6",
+      "nome": "Desenvolvimento",
+      "grupoFoco": "deltoide_anterior",
+      "grupoSecundario": "deltoide_medial",
+      "equipamento": "halteres",
+      "padrao": true,
+      "usuarioId": null
+    },
+    {
+      "id": "7",
+      "nome": "Elevação Lateral",
+      "grupoFoco": "deltoide_medial",
+      "grupoSecundario": null,
+      "equipamento": "halteres",
+      "padrao": true,
+      "usuarioId": null
+    },
+    {
+      "id": "8",
+      "nome": "Puxada Frontal",
+      "grupoFoco": "dorsal",
+      "grupoSecundario": "biceps",
+      "equipamento": "maquina",
+      "padrao": true,
+      "usuarioId": null
+    },
+    {
+      "id": "9",
+      "nome": "Remada Curvada",
+      "grupoFoco": "dorsal",
+      "grupoSecundario": "biceps",
+      "equipamento": "barra",
+      "padrao": true,
+      "usuarioId": null
+    },
+    {
+      "id": "10",
+      "nome": "Rosca Direta",
+      "grupoFoco": "biceps",
+      "grupoSecundario": null,
+      "equipamento": "barra",
+      "padrao": true,
+      "usuarioId": null
+    },
+    {
+      "id": "11",
+      "nome": "Tríceps Testa",
+      "grupoFoco": "triceps",
+      "grupoSecundario": null,
+      "equipamento": "barra",
+      "padrao": true,
+      "usuarioId": null
+    },
+    {
+      "id": "12",
+      "nome": "Panturrilha em Pé",
+      "grupoFoco": "panturrilha",
+      "grupoSecundario": null,
+      "equipamento": "maquina",
+      "padrao": true,
+      "usuarioId": null
+    }
+  ],
+  "fichas": [
+    {
+      "id": "1",
+      "nome": "Treino A - Legs/Lower",
+      "usuarioId": 1,
+      "exercicioIds": [
+        1,
+        2,
+        3,
+        12
+      ],
+      "criadoEm": "2026-03-01T10:00:00.000Z"
+    }
+  ],
+  "historico": [
+    {
+      "id": "1",
+      "usuarioId": 1,
+      "fichaId": 1,
+      "fichaNome": "Treino A - Legs/Lower",
+      "inicio": "2026-03-27T18:59:00.000Z",
+      "fim": "2026-03-27T19:45:00.000Z",
+      "series": [
+        {
+          "exercicioId": 1,
+          "exercicioNome": "Leg Press (Machine)",
+          "grupoFoco": "quadriceps",
+          "peso": 280,
+          "reps": 8,
+          "rpe": 8.5,
+          "repsEfetivas": 4.25,
+          "ev": 1190
+        },
+        {
+          "exercicioId": 1,
+          "exercicioNome": "Leg Press (Machine)",
+          "grupoFoco": "quadriceps",
+          "peso": 310,
+          "reps": 9,
+          "rpe": 10,
+          "repsEfetivas": 4.5,
+          "ev": 1395
+        }
+      ],
+      "evTotal": 2585,
+      "umRmMax": 403
+    },
+    {
+      "usuarioId": "1",
+      "fichaId": "1",
+      "fichaNome": "Treino A - Legs/Lower",
+      "inicio": "2026-04-21T18:29:00.015Z",
+      "fim": "2026-04-21T18:29:31.480Z",
+      "series": [
+        {
+          "exercicioId": "1",
+          "exercicioNome": "Leg Press (Machine)",
+          "grupoFoco": "quadriceps",
+          "peso": 100,
+          "reps": 10,
+          "rpe": 8,
+          "repsEfetivas": 3.5,
+          "ev": 350
+        }
+      ],
+      "evTotal": 350,
+      "umRmMax": 133,
+      "id": "OpUAfDvFj1I"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
