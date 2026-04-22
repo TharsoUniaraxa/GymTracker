@@ -1,19 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, ScrollView, Alert, Image
+  StyleSheet, ScrollView, Alert, Image, Modal
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import { RootStackParamList } from '../../App';
-import { Exercicio, SerieRegistrada } from '../types';
+import { Exercicio, SerieRegistrada, RegistroHistorico } from '../types';
 import {
   calcularRepsEfetivas, calcularEV, calcularUmRM,
   calcularFeederSets, buscarPRdoExercicio
 } from '../utils/calculos';
 import { muscleImages } from '../muscleImages';
-import BASE_URL from '../api';
+import { exercicioService } from '../services/exercicioService';
+import { historicoService } from '../services/historicoService';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, 'TreinoAtivo'>;
@@ -29,8 +30,10 @@ export default function TreinoAtivoScreen({ navigation, route }: Props) {
   const [peso, setPeso]                     = useState('');
   const [reps, setReps]                     = useState('');
   const [rpe, setRpe]                       = useState('');
-  const [historico, setHistorico]           = useState<any[]>([]);
+  const [historico, setHistorico]           = useState<RegistroHistorico[]>([]);
   const [inicio]                            = useState(new Date().toISOString());
+  const [tooltipRpe10Visible, setTooltipRpe10Visible] = useState(false);
+  const exerciciosComTooltipMostrado        = useRef<Set<number>>(new Set());
 
   const ultimaInteracao = useRef(Date.now());
 
@@ -59,13 +62,10 @@ export default function TreinoAtivoScreen({ navigation, route }: Props) {
 
   const fetchDados = async () => {
     try {
-      const [exsRaw, histRaw] = await Promise.all([
-        fetch(`${BASE_URL}/exercicios`).then(r => r.json()),
-        fetch(`${BASE_URL}/historico?usuarioId=${usuarioId}`).then(r => r.json()),
+      const [filtrados, histRaw] = await Promise.all([
+        exercicioService.getByIds(exercicioIds),
+        historicoService.listByUsuario(usuarioId),
       ]);
-      const filtrados = exercicioIds
-       .map((id: number) => exsRaw.find((e: Exercicio) => String(e.id) === String(id)))
-       .filter(Boolean);
       setExercicios(filtrados);
       setHistorico(histRaw);
     } catch {
@@ -118,6 +118,11 @@ export default function TreinoAtivoScreen({ navigation, route }: Props) {
     setReps('');
     setRpe('');
     registrarInteracao();
+
+    if (rpeNum >= 10 && !exerciciosComTooltipMostrado.current.has(exercicioAtual.id)) {
+      exerciciosComTooltipMostrado.current.add(exercicioAtual.id);
+      setTooltipRpe10Visible(true);
+    }
   };
 
   const removerSerie = (index: number) => {
@@ -171,12 +176,7 @@ export default function TreinoAtivoScreen({ navigation, route }: Props) {
     };
 
     try {
-      const response = await fetch(`${BASE_URL}/historico`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(registro),
-      });
-      const salvo = await response.json();
+      const salvo = await historicoService.save(registro);
       navigation.replace('ResumoTreino', { registro: salvo });
     } catch {
       Alert.alert('Error', 'Could not save workout.');
@@ -196,6 +196,7 @@ export default function TreinoAtivoScreen({ navigation, route }: Props) {
   }
 
   return (
+    <>
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
 
       {/* Header */}
@@ -345,6 +346,28 @@ export default function TreinoAtivoScreen({ navigation, route }: Props) {
 
       <View style={{ height: 40 }} />
     </ScrollView>
+
+    <Modal
+      transparent
+      visible={tooltipRpe10Visible}
+      animationType="fade"
+      onRequestClose={() => setTooltipRpe10Visible(false)}
+    >
+      <TouchableOpacity
+        style={styles.tooltipBackdrop}
+        activeOpacity={1}
+        onPress={() => setTooltipRpe10Visible(false)}
+      >
+        <View style={styles.tooltipCard}>
+          <Text style={styles.tooltipTitle}>Great effort!</Text>
+          <Text style={styles.tooltipText}>
+            Next set, try stopping one rep short — RPE 9 is actually the sweet spot for growth.
+          </Text>
+          <Text style={styles.tooltipDismiss}>Tap anywhere to dismiss</Text>
+        </View>
+      </TouchableOpacity>
+    </Modal>
+    </>
   );
 }
 
@@ -390,4 +413,20 @@ const styles = StyleSheet.create({
   finishButtonText:{ color: '#c8ff00', fontWeight: 'bold', fontSize: 16 },
   removeBtn:     { paddingLeft: 10 },
   removeBtnText: { color: '#ff4444', fontSize: 14 },
+  tooltipBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+  },
+  tooltipCard: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 14,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#c8ff00',
+  },
+  tooltipTitle:   { color: '#c8ff00', fontSize: 17, fontWeight: 'bold', marginBottom: 8 },
+  tooltipText:    { color: '#fff', fontSize: 14, lineHeight: 20 },
+  tooltipDismiss: { color: '#666', fontSize: 11, marginTop: 14, textAlign: 'center' },
 });

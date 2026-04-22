@@ -7,6 +7,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import CriarFichaScreen from './src/screens/CriarFichaScreen.tsx';
 import TreinoAtivoScreen from './src/screens/TreinoAtivoScreen.tsx';
 import ResumoTreinoScreen from './src/screens/ResumoTreinoScreen';
+import ConfigScreen from './src/screens/ConfigScreen';
 import { RegistroHistorico } from './src/types';
 
 export type RootStackParamList = {
@@ -15,6 +16,7 @@ export type RootStackParamList = {
   CriarFicha:   { usuarioId: number };
   TreinoAtivo:  { usuarioId: number; fichaId: number; fichaNome: string; exercicioIds: number[] };
   ResumoTreino: { registro: RegistroHistorico };
+  Config:       { usuarioId: number };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -31,6 +33,7 @@ export default function App() {
         <Stack.Screen name="CriarFicha"   component={CriarFichaScreen}  />
         <Stack.Screen name="TreinoAtivo"  component={TreinoAtivoScreen} />
         <Stack.Screen name="ResumoTreino" component={ResumoTreinoScreen}/>
+        <Stack.Screen name="Config"       component={ConfigScreen}      />
       </Stack.Navigator>
     </NavigationContainer>
   );

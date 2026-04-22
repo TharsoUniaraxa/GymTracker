@@ -69,3 +69,8 @@ export interface RegistroHistorico {
   evTotal: number;
   umRmMax: number;
 }
+
+export interface FeederSet {
+  peso: number;
+  descricao: string;
+}

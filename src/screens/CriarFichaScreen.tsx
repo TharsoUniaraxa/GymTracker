@@ -7,7 +7,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../App';
 import { Exercicio } from '../types';
-import BASE_URL from '../api';
+import { exercicioService } from '../services/exercicioService';
+import { fichaService } from '../services/fichaService';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, 'CriarFicha'>;
@@ -29,11 +30,8 @@ export default function CriarFichaScreen({ navigation, route }: Props) {
 
   const fetchExercicios = async () => {
     try {
-      const [padrao, custom] = await Promise.all([
-        fetch(`${BASE_URL}/exercicios?padrao=true`).then(r => r.json()),
-        fetch(`${BASE_URL}/exercicios?usuarioId=${usuarioId}`).then(r => r.json()),
-      ]);
-      setExercicios([...padrao, ...custom]);
+      const visiveis = await exercicioService.listForUsuario(usuarioId);
+      setExercicios(visiveis);
     } catch {
       Alert.alert('Error', 'Could not load exercises.');
     } finally {
@@ -62,18 +60,12 @@ const toggleExercicio = (id: any) => {
 
     try {
       setSaving(true);
-      const response = await fetch(`${BASE_URL}/fichas`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nome:         nomeFicha.trim(),
-          usuarioId,
-          exercicioIds: selecionados,
-          criadoEm:     new Date().toISOString(),
-        }),
+      await fichaService.save({
+        nome:         nomeFicha.trim(),
+        usuarioId,
+        exercicioIds: selecionados,
+        criadoEm:     new Date().toISOString(),
       });
-
-      if (!response.ok) throw new Error();
       navigation.goBack();
     } catch {
       Alert.alert('Error', 'Could not save workout plan.');

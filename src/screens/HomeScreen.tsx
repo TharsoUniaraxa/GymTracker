@@ -8,7 +8,7 @@ import { RouteProp, useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
 import { RootStackParamList } from '../../App';
 import { Ficha } from '../types';
-import BASE_URL from '../api';
+import { fichaService } from '../services/fichaService';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, 'Home'>;
@@ -30,11 +30,7 @@ useFocusEffect(
 const fetchFichas = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${BASE_URL}/fichas`);
-      const data: Ficha[] = await response.json();
-      const filtradas = data.filter(
-        f => String(f.usuarioId) === String(usuarioId)
-      );
+      const filtradas = await fichaService.listByUsuario(usuarioId);
       setFichas(filtradas);
     } catch (e) {
       Alert.alert('Error', 'Could not load workout plans.');
@@ -56,8 +52,18 @@ const fetchFichas = async () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Hey, {usuarioNome.split(' ')[0]} 👋</Text>
-        <Text style={styles.subtitle}>Your workout plans</Text>
+        <View style={styles.headerRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.greeting}>Hey, {usuarioNome.split(' ')[0]} 👋</Text>
+            <Text style={styles.subtitle}>Your workout plans</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.settingsBtn}
+            onPress={() => navigation.navigate('Config', { usuarioId })}
+          >
+            <Text style={styles.settingsIcon}>⚙</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <FlatList
@@ -94,7 +100,7 @@ renderItem={({ item }) => (
               style: 'destructive',
               onPress: async () => {
                 try {
-                  await fetch(`${BASE_URL}/fichas/${item.id}`, { method: 'DELETE' });
+                  await fichaService.delete(item.id);
                   setFichas(prev => prev.filter(f => String(f.id) !== String(item.id)));
                 } catch {
                   Alert.alert('Error', 'Could not delete plan.');
@@ -128,8 +134,11 @@ const styles = StyleSheet.create({
   container:   { flex: 1, backgroundColor: '#0d0d0d', paddingHorizontal: 20 },
   center:      { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0d0d0d' },
   header:      { paddingTop: 60, paddingBottom: 24 },
+  headerRow:   { flexDirection: 'row', alignItems: 'center' },
   greeting:    { fontSize: 26, fontWeight: 'bold', color: '#fff' },
   subtitle:    { fontSize: 14, color: '#666', marginTop: 4 },
+  settingsBtn: { padding: 8 },
+  settingsIcon:{ fontSize: 22, color: '#c8ff00' },
   empty:       { color: '#555', textAlign: 'center', marginTop: 60, fontSize: 15 },
 card: {
     backgroundColor: '#1a1a1a',

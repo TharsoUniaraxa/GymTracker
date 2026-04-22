@@ -1,20 +1,44 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   StyleSheet, ActivityIndicator, Alert
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
-import BASE_URL from '../api';
+import { Usuario } from '../types';
+import { usuarioService } from '../services/usuarioService';
+
+const STORAGE_KEY = 'usuario_logado';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, 'Login'>;
 };
 
 export default function LoginScreen({ navigation }: Props) {
-  const [email, setEmail]     = useState('');
-  const [senha, setSenha]     = useState('');
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail]           = useState('');
+  const [senha, setSenha]           = useState('');
+  const [loading, setLoading]       = useState(false);
+  const [bootstrapping, setBootstrapping] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const u: Usuario = JSON.parse(raw);
+          navigation.replace('Home', {
+            usuarioId:   Number(u.id),
+            usuarioNome: u.nome,
+          });
+          return;
+        }
+      } catch {
+        // ignora: segue pro login manual
+      }
+      setBootstrapping(false);
+    })();
+  }, []);
 
   const handleLogin = async () => {
     if (!email || !senha) {
@@ -24,18 +48,12 @@ export default function LoginScreen({ navigation }: Props) {
 
     try {
       setLoading(true);
-      const response = await fetch(`${BASE_URL}/usuarios`);
-      const data = await response.json();
-
-      const usuario = data.find(
-        (u: any) =>
-          u.email.toLowerCase() === email.toLowerCase().trim() &&
-          u.senha === senha
-      );
+      const usuario = await usuarioService.login(email, senha);
 
       if (usuario) {
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(usuario));
         navigation.replace('Home', {
-          usuarioId:   usuario.id,
+          usuarioId:   Number(usuario.id),
           usuarioNome: usuario.nome,
         });
       } else {
@@ -47,6 +65,14 @@ export default function LoginScreen({ navigation }: Props) {
       setLoading(false);
     }
   };
+
+  if (bootstrapping) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color="#c8ff00" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

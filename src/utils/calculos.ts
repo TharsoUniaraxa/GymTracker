@@ -1,25 +1,16 @@
-import { RegistroHistorico } from '../types';
-
-const MULTIPLICADOR_RPE: Record<number, number> = {
-  10: 4.5,
-  9:  5.0,
-  8:  3.5,
-  7:  2.0,
-  6:  0.75,
-};
+import { RegistroHistorico, FeederSet } from '../types';
 
 function getMultiplicador(rpe: number): number {
   if (rpe >= 10) return 4.5;
   if (rpe >= 9)  return 5.0;
-  if (rpe >= 8)  return 3.5;
+  if (rpe >= 8)  return 4.0;
   if (rpe >= 7)  return 2.0;
-  if (rpe >= 6)  return 0.75;
+  if (rpe >= 6)  return 1.0;
   return 0;
 }
 
 export function calcularRepsEfetivas(reps: number, rpe: number): number {
-  const mult = getMultiplicador(rpe);
-  return Math.min(reps, mult);
+  return Math.min(reps, getMultiplicador(rpe));
 }
 
 export function calcularEV(peso: number, repsEfetivas: number): number {
@@ -28,11 +19,6 @@ export function calcularEV(peso: number, repsEfetivas: number): number {
 
 export function calcularUmRM(peso: number, reps: number): number {
   return Math.round(peso * (1 + reps / 30));
-}
-
-export interface FeederSet {
-  peso: number;
-  descricao: string;
 }
 
 export function calcularFeederSets(umRM: number): FeederSet[] {
@@ -55,10 +41,10 @@ export function buscarPRdoExercicio(
   let maiorUmRM = 0;
 
   historico
-    .filter(h => h.usuarioId === usuarioId)
+    .filter(h => Number(h.usuarioId) === Number(usuarioId))
     .forEach(h => {
       h.series
-        .filter(s => s.exercicioId === exercicioId)
+        .filter(s => Number(s.exercicioId) === Number(exercicioId))
         .forEach(s => {
           const umRM = calcularUmRM(s.peso, s.reps);
           if (umRM > maiorUmRM) maiorUmRM = umRM;
