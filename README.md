@@ -23,7 +23,6 @@ Autor: Tharso
 - Tela de treino ativo com registro de peso, reps e RPE
 - Cálculo de Effective Volume (EV) em tempo real — métrica baseada em evidências científicas que considera o esforço percebido para avaliar o real estímulo de cada série
 - 1RM estimado pela fórmula de Epley
-- Feeder sets automáticos baseados no PR do exercício
 - Vibração haptic após 5 minutos sem interação
 - Tela de resumo pós-treino com métricas
 
